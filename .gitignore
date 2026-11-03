@@ -1,0 +1,10 @@
+# build output from trying the demo
+examples/demo-workspace/_out/
+# Python
+__pycache__/
+*.pyc
+# editors and OS
+.obsidian/
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,12 @@
+{
+  "name": "focus-lanes",
+  "displayName": "Focus Lanes",
+  "version": "0.1.0",
+  "description": "Run many projects from one folder of Markdown files: a STATUS.md per project, a lane rule that picks at most five tasks a day, a results scorecard, a dashboard page, and lessons that travel between projects.",
+  "author": {
+    "name": "Ghaith Al-Rousan"
+  },
+  "repository": "https://github.com/Agent-47x/focus-lanes",
+  "license": "MIT",
+  "keywords": ["productivity", "project-management", "dashboard", "obsidian", "markdown", "focus", "kanban"]
+}

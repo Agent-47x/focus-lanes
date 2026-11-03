@@ -1,0 +1,334 @@
+<title>Focus Lanes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F3F4F6;--surface:#FFFFFF;--surface-2:#F8F9FA;--ink:#171A20;--muted:#5B6270;--line:#DCDFE5;
+  --accent:#14615C;--accent-ink:#FFFFFF;--accent-soft:#E3F0EE;
+  --crit:#B42318;--crit-bg:#FEF3F2;--warn:#B54708;--warn-bg:#FFF6E5;--good:#067647;--good-bg:#ECFDF3;--chip:#EEF0F3;
+  --shadow:0 1px 2px rgba(20,25,35,.06),0 4px 14px rgba(20,25,35,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101216;--surface:#181B21;--surface-2:#1E222A;--ink:#E8EAEE;--muted:#9AA1AD;--line:#2A2F38;
+    --accent:#4FB3AC;--accent-ink:#0E1A19;--accent-soft:#17302E;
+    --crit:#F97066;--crit-bg:#2A1715;--warn:#FDB022;--warn-bg:#2B2110;--good:#47CD89;--good-bg:#10261A;--chip:#22262E;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101216;--surface:#181B21;--surface-2:#1E222A;--ink:#E8EAEE;--muted:#9AA1AD;--line:#2A2F38;
+  --accent:#4FB3AC;--accent-ink:#0E1A19;--accent-soft:#17302E;
+  --crit:#F97066;--crit-bg:#2A1715;--warn:#FDB022;--warn-bg:#2B2110;--good:#47CD89;--good-bg:#10261A;--chip:#22262E;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:1120px;margin:0 auto}
+h1,h2,h3{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;font-weight:600;line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:30px;letter-spacing:-.01em}
+h2{font-size:20px;margin-block:32px 12px;display:flex;align-items:baseline;gap:10px}
+h2 small{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:28px 16px;border-bottom:1px solid var(--line)}
+header .sub{color:var(--muted);font-size:13px;margin-top:4px}
+.counts{display:flex;flex-wrap:wrap;gap:8px}
+.count{display:inline-flex;align-items:baseline;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);font-size:13px;color:var(--muted)}
+.count b{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--ink);font-weight:500}
+.count.over b{color:var(--crit)}
+/* today */
+.today{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.today li{display:grid;grid-template-columns:44px 1fr;gap:0 14px;padding:14px 16px;border-top:1px solid var(--line)}
+.today li:first-child{border-top:0}
+.today .rank{font-family:"IBM Plex Mono",monospace;font-size:22px;font-weight:500;color:var(--accent);line-height:1.1;padding-top:2px}
+.today .action{font-size:16px;font-weight:500;margin:0}
+.today .meta{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-top:6px;font-size:13px;color:var(--muted)}
+.today .why{margin-top:4px;font-size:13px;color:var(--muted)}
+.empty{padding:20px;color:var(--muted)}
+.today.compact li{padding:10px 16px}
+.today.compact .rank{font-size:15px;padding-top:3px;color:var(--muted)}
+.today.compact .action{font-size:14px;font-weight:400}
+details.backlog{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:0}
+details.backlog>summary{cursor:pointer;padding:14px 16px;font-size:14px;color:var(--muted);list-style:none}
+details.backlog>summary::-webkit-details-marker{display:none}
+details.backlog>summary::before{content:"▸ ";color:var(--accent)}
+details.backlog[open]>summary::before{content:"▾ "}
+details.backlog ul{list-style:none;margin:0;padding:0 16px 14px}
+details.backlog li{padding:7px 0;border-top:1px solid var(--line);font-size:14px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:500;background:var(--chip);color:var(--ink);white-space:nowrap}
+.chip .id{font-family:"IBM Plex Mono",monospace;color:var(--muted);font-weight:400}
+.pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.pill.active{background:var(--accent-soft);color:var(--accent)}
+.pill.waiting{background:var(--warn-bg);color:var(--warn)}
+.pill.parked{background:var(--chip);color:var(--muted)}
+.pill.done{background:var(--good-bg);color:var(--good)}
+.lane{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.lane.focus{background:var(--accent);color:var(--accent-ink)}
+.lane.test{background:var(--accent-soft);color:var(--accent)}
+.lane.obligation{background:var(--warn-bg);color:var(--warn)}
+.lane.enabler{background:var(--chip);color:var(--ink)}
+.lane.parked,.lane.none{background:var(--chip);color:var(--muted)}
+.lane.done{background:var(--good-bg);color:var(--good)}
+/* scorecard */
+.score{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;align-items:start}
+.slot{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.slot.focus{border-color:var(--accent);box-shadow:var(--shadow)}
+.slot .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.slot .pname{font-weight:600;font-size:15px}
+.slot .metric{font-size:13px;color:var(--muted)}
+.slot .big{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:500;line-height:1}
+.slot .big small{font-size:14px;color:var(--muted);font-weight:400}
+.bar{height:6px;border-radius:3px;background:var(--chip);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.slot .sub2{font-size:12px;color:var(--muted);font-family:"IBM Plex Mono",monospace;display:flex;flex-wrap:wrap;gap:4px 12px}
+.slot ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.slot li{display:flex;flex-direction:column;gap:2px;padding-top:6px;border-top:1px solid var(--line)}
+.slot li:first-child{border-top:0;padding-top:0}
+.slot li b{font-weight:500}
+.slot .quiet{font-size:13px;color:var(--muted);margin:0}
+.prio{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;padding:1px 6px;border:1px solid var(--line);border-radius:4px;color:var(--muted)}
+.prio.p1{border-color:var(--crit);color:var(--crit)}
+.due{font-family:"IBM Plex Mono",monospace;font-size:12px}
+.due.over{color:var(--crit);font-weight:500}
+.due.soon{color:var(--warn);font-weight:500}
+.stale{color:var(--warn);font-size:12px;font-weight:500}
+.draft{color:var(--muted);font-size:11px;border:1px dashed var(--line);border-radius:4px;padding:0 5px}
+/* flags */
+.flags{margin:0;padding:12px 16px 12px 32px;background:var(--warn-bg);border:1px solid var(--line);border-radius:8px;font-size:14px}
+.flags li{margin-block:2px}
+/* toolbar */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.toolbar .filters{display:flex;flex-wrap:wrap;gap:6px}
+.fbtn{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;cursor:pointer}
+.fbtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.fbtn:focus-visible,.card:focus-visible,#q:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#q{font:inherit;font-size:14px;padding:7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:200px;flex:1 1 200px;max-width:340px;margin-left:auto}
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-align:left;font:inherit;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:8px;width:100%;min-width:0}
+.card:hover{border-color:var(--accent)}
+.card.open{grid-column:1 / -1;cursor:default}
+.card .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card .name{font-weight:600;font-size:15px;flex:1 1 auto;min-width:0}
+.card .name .id{font-family:"IBM Plex Mono",monospace;color:var(--muted);font-weight:400;margin-right:6px}
+.card .next{margin:0;font-size:14px}
+.card .next b{font-weight:500;color:var(--muted);font-size:12px;letter-spacing:.05em;text-transform:uppercase;margin-right:6px}
+.card .foot{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.detail{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px 28px;border-top:1px solid var(--line);padding-top:14px;margin-top:4px;cursor:auto}
+.detail section{min-width:0}
+.detail h3{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.detail p{margin:0;font-size:14px}
+.detail ul{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:5px;font-size:14px}
+.detail li{display:flex;gap:8px;align-items:flex-start}
+.detail li .box{flex:0 0 auto;width:14px;height:14px;margin-top:4px;border:1.5px solid var(--muted);border-radius:3px}
+.detail li.done .box{background:var(--good);border-color:var(--good)}
+.detail li.done{color:var(--muted);text-decoration:line-through}
+.detail li .tmeta{display:inline-flex;gap:8px;margin-left:6px;white-space:nowrap}
+.detail .donot li::before{content:"";flex:0 0 auto;width:8px;height:8px;margin-top:8px;border-radius:2px;background:var(--crit)}
+.detail .goal{grid-column:1 / -1}
+.detail .path{grid-column:1 / -1;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--muted);word-break:break-all}
+.detail .close{grid-column:1 / -1;justify-self:start}
+footer{margin-top:40px;font-size:12px;color:var(--muted)}
+@media (max-width:480px){h1{font-size:24px}.today li{grid-template-columns:32px 1fr;padding:12px}.today .rank{font-size:18px}}
+@media (prefers-reduced-motion: no-preference){.card{transition:border-color .15s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Focus Lanes</h1>
+      <div class="sub" id="generated"></div>
+    </div>
+    <div class="counts" id="counts"></div>
+  </header>
+
+  <h2>Today <small id="today-date"></small></h2>
+  <ol class="today" id="today"></ol>
+
+  <h2>Scorecard <small>results, not activity</small></h2>
+  <div class="score" id="score"></div>
+
+  <h2>Next up <small id="next-count"></small></h2>
+  <ol class="today compact" id="next"></ol>
+
+  <h2>Backlog <small id="backlog-count"></small></h2>
+  <details class="backlog" id="backlog-wrap"><summary id="backlog-summary">Show the rest</summary><ul id="backlog"></ul></details>
+
+  <div id="flags-wrap" hidden>
+    <h2>Flags</h2>
+    <ul class="flags" id="flags"></ul>
+  </div>
+
+  <h2>Projects <small id="proj-count"></small></h2>
+  <div class="toolbar">
+    <div class="filters" id="filters" role="group" aria-label="Filter by lane"></div>
+    <input id="q" type="search" placeholder="Search projects, actions, do-nots…" aria-label="Search">
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <footer>Source of truth: each project's <span class="mono">STATUS.md</span>. Rebuilt by <span class="mono">00 Command Center/build_dashboard.py</span>; edit the files, not the page. Every project sits in one lane: Focus (one venture), Test (one time-boxed experiment), Obligations (outside deadlines), Enabler, Parked. Today holds up to three Focus tasks plus Obligations overdue or due within three days, never more than five. Project memory and logs are deliberately not shown here. Built with Focus Lanes.</footer>
+</div>
+
+<script id="data" type="application/json">/*__DATA__*/</script>
+<script>
+(function(){
+  const DATA = JSON.parse(document.getElementById('data').textContent);
+  const today = DATA.today;
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const dayDiff = d => d ? Math.round((new Date(d) - new Date(today)) / 86400000) : null;
+  const dueHtml = d => {
+    if (!d) return '';
+    const n = dayDiff(d);
+    const cls = n < 0 ? 'over' : n <= 7 ? 'soon' : '';
+    const label = n < 0 ? `overdue ${-n}d` : n === 0 ? 'due today' : n === 1 ? 'due tomorrow' : `due in ${n}d`;
+    return `<span class="due ${cls}" title="${esc(d)}">${esc(d)} · ${label}</span>`;
+  };
+  const chip = p => `<span class="chip"><span class="id">${esc(p.id)}</span>${esc(p.short || p.project)}</span>`;
+  const prio = p => `<span class="prio p${p}">P${p}</span>`;
+
+  // header
+  document.getElementById('generated').textContent = `Generated ${DATA.generated_human} · ${DATA.projects.length} projects`;
+  document.getElementById('today-date').textContent = DATA.today_human;
+  const LC = DATA.lane_counts, LL = DATA.lane_label;
+  const laneTag = l => `<span class="lane ${esc(l)}">${esc(LL[l] || l)}</span>`;
+  document.getElementById('counts').innerHTML = [
+    `<span class="count ${LC.focus !== 1 ? 'over':''}"><b>${LC.focus}</b> focus</span>`,
+    `<span class="count ${LC.test > 1 ? 'over':''}"><b>${LC.test}</b> test</span>`,
+    `<span class="count"><b>${LC.obligation}</b> obligations</span>`,
+    `<span class="count"><b>${LC.enabler}</b> enabler</span>`,
+    `<span class="count"><b>${LC.parked}</b> parked</span>`,
+    `<span class="count"><b>${LC.done}</b> done</span>`
+  ].join('');
+
+  // task bands — Today (5) / Next up (10) / Backlog (the rest)
+  const taskLine = (t, withWhy) => `
+    <li>
+      <div class="rank">${t.rank}</div>
+      <div>
+        <p class="action">${esc(t.text)}</p>
+        <div class="meta">${laneTag(t.lane)} ${chip(t)} ${dueHtml(t.due)} ${t.est ? `<span class="mono">~${esc(t.est)}</span>` : ''}</div>
+        ${withWhy ? `<div class="why">${esc(t.why)}</div>` : ''}
+      </div>
+    </li>`;
+  const tl = document.getElementById('today');
+  tl.innerHTML = DATA.today_tasks.length
+    ? DATA.today_tasks.map(t => taskLine(t, true)).join('')
+    : '<li class="empty">Nothing in Focus and no Obligation due within three days — check the flags.</li>';
+
+  // scorecard — one block per lane
+  const SC = DATA.scorecard;
+  const clip = (t, n) => { t = String(t || ''); return t.length <= n ? t : t.slice(0, n - 1).replace(/[\s,;:—-]+$/, '') + '…'; };
+  const dLeft = x => x.days_left == null ? '' : (x.days_left >= 0 ? `${x.days_left} days left` : `ended ${-x.days_left} days ago`);
+  const measured = (x, lane) => `
+    <div class="slot ${lane}">
+      <div class="hd">${laneTag(lane)}<span class="pname">${esc(x.id)} ${esc(x.short)}</span></div>
+      <div class="metric">${esc(x.metric || 'No metric set')}</div>
+      <div class="big">${x.current ?? 0}<small> / ${x.target ?? '—'}</small></div>
+      <div class="bar"><i style="width:${x.pct ?? 0}%"></i></div>
+      <div class="sub2">${x.ends ? `<span>ends ${esc(x.ends)} · ${dLeft(x)}</span>` : ''}<span>${x.done_7d} done in 7 days</span><span>${x.open} open</span></div>
+    </div>`;
+  const blocks = [];
+  SC.focus.forEach(x => blocks.push(measured(x, 'focus')));
+  if (!SC.focus.length) blocks.push(`<div class="slot focus"><div class="hd">${laneTag('focus')}</div><p class="quiet">No Focus project set.</p></div>`);
+  SC.test.forEach(x => blocks.push(measured(x, 'test')));
+  if (SC.obligation.length) blocks.push(`
+    <div class="slot"><div class="hd">${laneTag('obligation')}<span class="pname">Next deadline per case</span></div>
+      <ul>${SC.obligation.map(x => `<li><b>${esc(x.id)} ${esc(x.short)}</b><span title="${esc(x.next_task)}">${esc(clip(x.next_task, 90) || 'Nothing listed')}</span>${x.next_due ? dueHtml(x.next_due) : ''}</li>`).join('')}</ul>
+    </div>`);
+  if (SC.enabler.length || SC.parked.length) {
+    const reviews = [...new Set(SC.parked.map(x => x.restart).filter(Boolean))].sort();
+    blocks.push(`
+    <div class="slot"><div class="hd">${laneTag('enabler')}${laneTag('parked')}</div>
+      <ul>${SC.enabler.map(x => `<li><b>${esc(x.id)} ${esc(x.short)}</b><span>${x.open} open — none enter Today; pull a task into Focus when the Focus needs it</span></li>`).join('')}
+      ${SC.parked.length ? `<li><b>${SC.parked.length} parked</b><span>${esc(SC.parked.map(x => x.id + ' ' + x.short).join(' · '))}</span><span class="mono" style="font-size:12px">review ${esc(reviews.join(', ') || 'no date')}</span></li>` : ''}</ul>
+    </div>`);
+  }
+  document.getElementById('score').innerHTML = blocks.join('');
+
+  const nl = document.getElementById('next');
+  nl.innerHTML = DATA.next_up.length
+    ? DATA.next_up.map(t => taskLine(t, false)).join('')
+    : '<li class="empty">Nothing queued behind today.</li>';
+  document.getElementById('next-count').textContent = `${DATA.next_up.length} after today's ${DATA.today_tasks.length}`;
+
+  document.getElementById('backlog-count').textContent = `${DATA.backlog.length} of ${DATA.open_total} open tasks`;
+  document.getElementById('backlog-summary').textContent =
+    DATA.backlog.length ? `Show the remaining ${DATA.backlog.length} tasks` : 'Nothing in the backlog';
+  document.getElementById('backlog').innerHTML = DATA.backlog.map(t => `
+    <li>${chip(t)} <span>${esc(t.text)}</span> ${dueHtml(t.due)}</li>`).join('');
+
+  // flags
+  if (DATA.flags.length) {
+    document.getElementById('flags-wrap').hidden = false;
+    document.getElementById('flags').innerHTML = DATA.flags.map(f => `<li>${esc(f)}</li>`).join('');
+  }
+
+  // projects
+  const order = {focus:1, test:2, obligation:3, enabler:4, none:5, parked:6, done:7};
+  const projects = DATA.projects.slice().sort((a,b) => order[a.lane]-order[b.lane] || a.priority-b.priority || (a.deadline||'9999').localeCompare(b.deadline||'9999') || a.id.localeCompare(b.id));
+  let filter = 'all', query = '', openId = null;
+  try { filter = localStorage.getItem('pcc-lane') || 'all'; } catch(e) {}
+
+  const filters = [['all','All'],['focus','Focus'],['test','Test'],['obligation','Obligations'],['enabler','Enabler'],['parked','Parked'],['done','Done']];
+  if (!filters.some(f => f[0] === filter)) filter = 'all';
+  const fEl = document.getElementById('filters');
+  fEl.innerHTML = filters.map(([k,l]) => `<button class="fbtn" type="button" data-f="${k}" aria-pressed="${k===filter}">${l}</button>`).join('');
+  fEl.addEventListener('click', e => {
+    const b = e.target.closest('.fbtn'); if (!b) return;
+    filter = b.dataset.f; try { localStorage.setItem('pcc-lane', filter); } catch(err) {}
+    fEl.querySelectorAll('.fbtn').forEach(x => x.setAttribute('aria-pressed', x.dataset.f === filter));
+    render();
+  });
+  document.getElementById('q').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); render(); });
+
+  const taskLi = t => `<li class="${t.done?'done':''}"><span class="box"></span><span>${esc(t.text)}${(t.due||t.est)?`<span class="tmeta">${dueHtml(t.due)}${t.est?`<span class="mono" style="font-size:12px">~${esc(t.est)}</span>`:''}</span>`:''}</span></li>`;
+
+  function cardHtml(p, open) {
+    const stale = p.stale ? `<span class="stale">stale ${p.idle_days}d</span>` : '';
+    const draft = p.draft ? `<span class="draft">draft</span>` : '';
+    const openTasks = p.tasks.filter(t => !t.done);
+    const detail = !open ? '' : `
+      <div class="detail" onclick="event.stopPropagation()">
+        <section class="goal"><h3>Goal</h3><p>${esc(p.goal)}</p></section>
+        <section><h3>Now</h3><p>${esc(p.now)}</p></section>
+        <section><h3>Pending actions (${openTasks.length})</h3>${openTasks.length ? `<ul>${openTasks.map(taskLi).join('')}</ul>` : '<p>None listed.</p>'}</section>
+        <section><h3>Do not</h3>${p.donot.length ? `<ul class="donot">${p.donot.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ul>` : '<p>Nothing recorded.</p>'}</section>
+        <section><h3>Waiting on</h3>${p.waiting.length ? `<ul>${p.waiting.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ul>` : '<p>Nothing.</p>'}</section>
+        <section><h3>Deadlines</h3>${p.deadlines.length ? `<ul>${p.deadlines.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ul>` : '<p>None.</p>'}</section>
+        <section><h3>Recently done</h3>${p.donelog.length ? `<ul>${p.donelog.slice(0,4).map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ul>` : '<p>Nothing logged.</p>'}</section>
+        ${p.tasks.some(t=>t.done) ? `<section><h3>Ticked off</h3><ul>${p.tasks.filter(t=>t.done).map(taskLi).join('')}</ul></section>` : ''}
+        <div class="path">${esc(p.folder)}\\STATUS.md · updated ${esc(p.last_updated)}</div>
+        <button class="fbtn close" type="button" data-close="1">Collapse</button>
+      </div>`;
+    return `
+      <div class="card ${open?'open':''}" role="button" tabindex="0" aria-expanded="${open}" data-id="${esc(p.key)}">
+        <div class="top">
+          <span class="name"><span class="id">${esc(p.id)}</span>${esc(p.project)}</span>
+          ${draft}${stale}${laneTag(p.lane)}${p.status === 'waiting' ? '<span class="pill waiting">waiting</span>' : ''}
+        </div>
+        <p class="next"><b>Next</b>${esc(p.next_action || '—')}</p>
+        <div class="foot">${p.deadline ? dueHtml(p.deadline) : ''}<span>${openTasks.length} open</span>${p.lane === 'parked' && p.restart ? `<span>review ${esc(p.restart)}</span>` : ''}${(p.lane === 'focus' || p.lane === 'test') && p.target != null ? `<span>${esc(p.metric)}: ${p.current ?? 0} / ${p.target}</span>` : ''}${p.waiting_on ? `<span>waiting: ${esc(p.waiting_on)}</span>` : ''}</div>
+        ${detail}
+      </div>`;
+  }
+
+  function render() {
+    const list = projects.filter(p => (filter === 'all' || p.lane === filter) && (!query || p.search.includes(query)));
+    document.getElementById('proj-count').textContent = `${list.length} of ${projects.length}`;
+    document.getElementById('grid').innerHTML = list.map(p => cardHtml(p, p.key === openId)).join('') || '<p class="empty">No projects match.</p>';
+  }
+  const grid = document.getElementById('grid');
+  grid.addEventListener('click', e => {
+    if (e.target.closest('[data-close]')) { openId = null; render(); return; }
+    const c = e.target.closest('.card'); if (!c || c.classList.contains('open')) return;
+    openId = c.dataset.id; render();
+    const el = grid.querySelector('.card.open'); if (el) el.scrollIntoView({block:'nearest'});
+  });
+  grid.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const c = e.target.closest('.card'); if (!c) return;
+    e.preventDefault(); openId = c.classList.contains('open') ? null : c.dataset.id; render();
+  });
+  render();
+})();
+</script>

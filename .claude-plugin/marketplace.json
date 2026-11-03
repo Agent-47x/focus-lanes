@@ -1,0 +1,14 @@
+{
+  "name": "focus-lanes",
+  "description": "Focus Lanes — a lane-based project dashboard for Claude, built on plain Markdown files",
+  "owner": {
+    "name": "Ghaith Al-Rousan"
+  },
+  "plugins": [
+    {
+      "name": "focus-lanes",
+      "source": "./plugins/focus-lanes",
+      "description": "Run many projects from one folder: one STATUS.md per project, a lane rule that picks at most five tasks a day, a results scorecard, and lessons that travel between projects"
+    }
+  ]
+}
